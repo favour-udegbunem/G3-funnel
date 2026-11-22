@@ -5,22 +5,38 @@ import {
   ChevronLeft,
   ChevronRight,
   Play,
+  Pause,
+  Volume2,
   VolumeX,
 } from 'lucide-react'
 
 const testimonials = [
-  { id: 1, name: 'Parent Testimonial', role: 'Parent / Guardian' },
-  { id: 2, name: 'Mentorship Story', role: 'G3 Mentorship Experience' },
-  { id: 3, name: 'Girl Testimonial', role: 'Programme Participant' },
-  { id: 4, name: 'Parent Testimonial', role: 'Parent / Guardian' },
-  { id: 5, name: 'Mentorship Story', role: 'G3 Mentorship Experience' },
-  { id: 6, name: 'Girl Testimonial', role: 'Programme Participant' },
+  {
+    id: 1,
+    name: 'Parent Testimonial',
+    role: 'Parent / Guardian',
+    video:
+      'https://res.cloudinary.com/rpefoddh/video/upload/v1795306470/Tes-compressed.mp4',
+  },
+  {
+    id: 2,
+    name: 'Mentorship Story',
+    role: 'G3 Mentorship Experience',
+    video:
+      'https://res.cloudinary.com/rpefoddh/video/upload/v1795306018/Testimony_6-compressed.mp4',
+  },
+  {
+    id: 3,
+    name: 'Girl Testimonial',
+    role: 'Programme Participant',
+    video:
+      'https://res.cloudinary.com/rpefoddh/video/upload/v1795305994/Testimony_7-compressed.mp4',
+  },
 ]
 
 function ProgrammeCard() {
   return (
     <div className="w-full max-w-[414px] overflow-hidden rounded-[21px] border border-[#E9A805]/40 bg-[#0d1730] shadow-[0_20px_45px_rgba(233,168,5,0.28)]">
-
       <div className="flex h-[35px] items-center justify-center gap-2 border-b border-white/10 bg-[#27282d] text-[11px] font-extrabold tracking-[2px] text-[#E9A805]">
         <span className="h-[9px] w-[9px] rounded-full bg-[#E9A805] shadow-[0_0_0_4px_rgba(233,168,5,0.15)]" />
         G3 MENTORSHIP PROGRAMME
@@ -64,34 +80,84 @@ function ProgrammeCard() {
 }
 
 function TestimonialCard({ item }) {
+  const videoRef = useRef(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [isMuted, setIsMuted] = useState(true)
+
+  const togglePlay = async () => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (video.paused) {
+      try {
+        await video.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.error('Video playback error:', error)
+      }
+    } else {
+      video.pause()
+      setIsPlaying(false)
+    }
+  }
+
+  const toggleMute = () => {
+    const video = videoRef.current
+    if (!video) return
+
+    video.muted = !video.muted
+    setIsMuted(video.muted)
+  }
+
   return (
     <div className="w-[174px] shrink-0 snap-center sm:w-[190px]">
-      {/* Video placeholder */}
-      <div className="group relative h-[300px] overflow-hidden rounded-t-[17px] rounded-b-[17px] border border-white/15 bg-gradient-to-b from-[#30234a] via-[#171d36] to-[#080e20] sm:h-[366px]">
+      <div className="group relative h-[300px] overflow-hidden rounded-[17px] border border-white/15 bg-[#080e20] sm:h-[366px]">
+        <video
+          ref={videoRef}
+          src={item.video}
+          className="absolute inset-0 h-full w-full object-cover"
+          playsInline
+          preload="metadata"
+          muted
+          controls={false}
+          onPlay={() => setIsPlaying(true)}
+          onPause={() => setIsPlaying(false)}
+          onEnded={() => setIsPlaying(false)}
+        />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-white/20 bg-white/10">
-            <Play size={24} className="ml-1 text-white" />
-          </div>
+        {/* Video play overlay */}
+        {!isPlaying && (
+          <button
+            type="button"
+            onClick={togglePlay}
+            aria-label={`Play ${item.name}`}
+            className="absolute inset-0 z-10 flex items-center justify-center bg-black/20 transition hover:bg-black/35"
+          >
+            <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/30 bg-white/15 text-white backdrop-blur-md transition group-hover:scale-110">
+              <Play size={25} className="ml-1" />
+            </span>
+          </button>
+        )}
 
-          <p className="text-[11px] font-extrabold tracking-[2px] text-[#E9A805]">
-            VIDEO PLACEHOLDER
-          </p>
+        {/* Video controls */}
+        <div className="absolute right-0 bottom-0 left-0 z-20 flex items-center justify-center gap-3 bg-gradient-to-t from-black/80 to-transparent px-3 pt-12 pb-4">
+          <button
+            type="button"
+            onClick={togglePlay}
+            aria-label={isPlaying ? 'Pause video' : 'Play video'}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#071126]/90 text-white transition hover:bg-[#25304a]"
+          >
+            {isPlaying ? <Pause size={17} /> : <Play size={17} />}
+          </button>
 
-          <p className="mt-2 text-xs leading-relaxed text-white/60">
-            Add G3 testimonial video here
-          </p>
-        </div>
-
-        {/* Video controls placeholder */}
-        <div className="absolute right-0 bottom-0 left-0 flex items-center justify-center gap-3 bg-gradient-to-t from-black/70 to-transparent px-3 pt-12 pb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#071126]/90 text-white">
-            <Play size={17} />
-          </div>
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#071126]/90 text-white">
-            <VolumeX size={17} />
-          </div>
+          <button
+            type="button"
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Unmute video' : 'Mute video'}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-[#071126]/90 text-white transition hover:bg-[#25304a]"
+          >
+            {isMuted ? <VolumeX size={17} /> : <Volume2 size={17} />}
+          </button>
         </div>
       </div>
 
@@ -113,45 +179,35 @@ function Testimonials() {
   const carouselRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const scrollCarousel = (direction) => {
-    const container = carouselRef.current
-    if (!container) return
-
-    const cardWidth = container.querySelector('.testimonial-card')
-      ?.getBoundingClientRect().width
-
-    if (!cardWidth) return
-
-    container.scrollBy({
-      left: direction * (cardWidth + 16),
-      behavior: 'smooth',
-    })
-
-    setActiveIndex((current) =>
-      Math.max(0, Math.min(5, current + direction))
-    )
-  }
-
   const goToSlide = (index) => {
     const container = carouselRef.current
     if (!container) return
 
-    const cardWidth = container.querySelector('.testimonial-card')
-      ?.getBoundingClientRect().width
+    const card = container.querySelector('.testimonial-card')
+    if (!card) return
 
-    if (!cardWidth) return
+    const cardWidth = card.getBoundingClientRect().width
+    const gap = 16
 
     container.scrollTo({
-      left: index * (cardWidth + 16),
+      left: index * (cardWidth + gap),
       behavior: 'smooth',
     })
 
     setActiveIndex(index)
   }
 
+  const scrollCarousel = (direction) => {
+    goToSlide(
+      Math.max(
+        0,
+        Math.min(testimonials.length - 1, activeIndex + direction)
+      )
+    )
+  }
+
   return (
     <div className="mt-[38px] w-full max-w-[590px]">
-
       {/* Testimonial heading */}
       <div className="mb-5 text-center">
         <p className="text-[12px] font-extrabold tracking-[2px] text-[#aeb9ce]">
@@ -165,15 +221,25 @@ function Testimonials() {
 
       {/* Carousel */}
       <div className="relative">
-
         <div
           ref={carouselRef}
+          onScroll={(e) => {
+            const card = e.currentTarget.querySelector('.testimonial-card')
+            if (!card) return
+
+            const step = card.getBoundingClientRect().width + 16
+            const index = Math.round(e.currentTarget.scrollLeft / step)
+
+            setActiveIndex(
+              Math.max(0, Math.min(testimonials.length - 1, index))
+            )
+          }}
           className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-0 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {testimonials.map((item) => (
             <div
               key={item.id}
-              className="testimonial-card"
+              className="testimonial-card shrink-0"
             >
               <TestimonialCard item={item} />
             </div>
@@ -186,7 +252,7 @@ function Testimonials() {
           onClick={() => scrollCarousel(-1)}
           disabled={activeIndex === 0}
           aria-label="Previous testimonials"
-          className="absolute top-[38%] -left-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#101a30] text-white shadow-lg transition hover:bg-[#25304a] disabled:opacity-40"
+          className="absolute top-[38%] -left-3 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#101a30] text-white shadow-lg transition hover:bg-[#25304a] disabled:opacity-40"
         >
           <ChevronLeft size={20} />
         </button>
@@ -195,9 +261,9 @@ function Testimonials() {
         <button
           type="button"
           onClick={() => scrollCarousel(1)}
-          disabled={activeIndex === 5}
+          disabled={activeIndex === testimonials.length - 1}
           aria-label="Next testimonials"
-          className="absolute top-[38%] -right-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#101a30] text-white shadow-lg transition hover:bg-[#25304a] disabled:opacity-40"
+          className="absolute top-[38%] -right-3 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-[#101a30] text-white shadow-lg transition hover:bg-[#25304a] disabled:opacity-40"
         >
           <ChevronRight size={20} />
         </button>
@@ -226,12 +292,10 @@ function Testimonials() {
 export default function Hero() {
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-[#050d21] px-5 pt-[58px] pb-[100px] text-white">
-
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_8%,rgba(0,75,150,0.25),transparent_48%)]" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-[850px] flex-col items-center text-center">
-
         {/* Eyebrow */}
         <p className="mb-[23px] text-[13px] font-extrabold tracking-[2.5px] text-[#E9A805]">
           G3 ONE-YEAR MENTORSHIP PROGRAMME
@@ -255,7 +319,6 @@ export default function Hero() {
 
         {/* Price and CTA */}
         <div className="mt-[35px] flex flex-col items-center">
-
           <p className="mb-[17px] text-[15px] text-white">
             Investment{' '}
             <strong className="text-[21px] font-black">
@@ -264,7 +327,7 @@ export default function Hero() {
           </p>
 
           <a
-            href="#register"
+            href="#mentorship-registration"
             className="flex min-h-[56px] min-w-[233px] items-center justify-center gap-3 rounded-[13px] bg-[#E9A805] px-7 py-3 text-[15px] font-extrabold text-[#080d19] shadow-[0_10px_28px_rgba(233,168,5,0.3)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#f5bd25]"
           >
             Reserve My Seat
@@ -272,9 +335,8 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Testimonial video carousel - still part of Hero */}
+        {/* Testimonial video carousel */}
         <Testimonials />
-
       </div>
     </section>
   )
